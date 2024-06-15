@@ -14,8 +14,10 @@ const resolvers = {
     },
     Mutation:{
         async createUser(_,{pin, name}){
+            console.log("backend:",parseInt(pin),name)
+
             const newUser = await User.create({
-                pin: pin,
+                pin: parseInt(pin),
                 name: name
             })
             return newUser

@@ -2,12 +2,10 @@ const {model,Schema} = require('mongoose')
 
 const logSchema = new Schema({
     description:{
-        type: String,
-        required: true
+        type: String
     },
     hours:{
-        type: Number,
-        required: true
+        type: Number
     }
 })
 
@@ -15,7 +13,9 @@ const userSchema = new Schema({
     pin:{
         type: Number,
         required: true,
-        unique: true
+        unique: true,
+        min:[4,'PIN must be 4 numbers'],
+        max:[4,'PIN must be 4 numbers']
     },
     name:{
         type: String,
@@ -23,12 +23,10 @@ const userSchema = new Schema({
     },
     logs: [logSchema],
     timeIn:{
-        type: Date,
-        required: true
+        type: Date
     },
     timeOut:{
-        type: Date,
-        required: true
+        type: Date
     }
 })
 
