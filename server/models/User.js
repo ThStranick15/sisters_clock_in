@@ -1,6 +1,9 @@
 const {model,Schema} = require('mongoose')
 
 const logSchema = new Schema({
+    date:{
+        type: String
+    },
     description:{
         type: String
     },
@@ -14,8 +17,12 @@ const userSchema = new Schema({
         type: Number,
         required: true,
         unique: true,
-        min:[4,'PIN must be 4 numbers'],
-        max:[4,'PIN must be 4 numbers']
+        validate:{
+            validator: function(value){
+                return /^[0-9]{4}$/.test(value.toString());
+            },
+            message: props => `${props.value} is not 4 numbers.`
+        }
     },
     name:{
         type: String,

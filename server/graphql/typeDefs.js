@@ -9,12 +9,14 @@ const typeDefs = gql`
     }
 
     type Query {
-        getUser(pin: String!): User
+        getUser(pin: Int!): User
         getUsers: [User]
     }
 
     type Mutation {
         createUser(pin: Int!, name: String!): User
+        signInUser(pin: Int!): User
+        signOutUser(pin: Int!, description: String!): User
     }
 `
 

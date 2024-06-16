@@ -4,6 +4,7 @@ import App from './App.jsx'
 import './index.css'
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
 import { onError } from '@apollo/client/link/error'
+import { StoreProvider } from './store/index.jsx';
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
@@ -26,15 +27,12 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 })
 
-// const client = new ApolloClient({
-//   uri: '/graphql',
-//   cache: new InMemoryCache(),
-// });
-
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <App />
+      <StoreProvider>
+        <App />
+      </StoreProvider>
     </ApolloProvider>
   </React.StrictMode>,
 )

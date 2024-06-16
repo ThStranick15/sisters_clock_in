@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client"
 
 export const GET_USER = gql`
-    query GetUser($userPin: Int){
-        getUser(userPin: $userPin){
+    query GetUser($pin: Int!){
+        getUser(pin: $pin){
             pin
             name
         }
