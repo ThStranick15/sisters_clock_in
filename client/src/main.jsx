@@ -5,6 +5,7 @@ import './index.css'
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
 import { onError } from '@apollo/client/link/error'
 import { StoreProvider } from './store/index.jsx';
+import {BrowserRouter} from 'react-router-dom'
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
@@ -30,9 +31,11 @@ const client = new ApolloClient({
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ApolloProvider client={client}>
+      <BrowserRouter>
       <StoreProvider>
         <App />
       </StoreProvider>
+      </BrowserRouter>
     </ApolloProvider>
   </React.StrictMode>,
 )
