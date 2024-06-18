@@ -1,6 +1,8 @@
 const User = require('../models/User')
+const {GraphQLDateTime} = require('graphql-scalars')
 
 const resolvers = {
+    Date: GraphQLDateTime,
     Query:{
         async getUser(_, {pin}){
             const user = await User.findOne({pin: pin})

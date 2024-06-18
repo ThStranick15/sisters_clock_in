@@ -68,21 +68,6 @@ export default function Form(){
         setText("")
     }
 
-    // useEffect(()=>{
-    //     if(!loading && data?.getUser){
-    //         console.log("here")
-    //         setRecentSignIn(data.getUser.name)
-    //         if(signedInUsers.includes(data.getUser)){
-    //             setSignedInUsers(prevUsers => {return prevUsers.filter((user)=>user !== data.getUser)}) //front end
-    //             //signOutUser()
-    //             }
-    //             else{
-    //             setSignedInUsers(prevUsers => [...prevUsers, data.getUser]) //front end
-    //             //signInUser()
-    //             }
-    //     }
-    // },[called])
-
     function list(){ //lists out names of people who have signed in
         const names = signedInUsers.map((e)=>e.name)
         const namesString = names.join(", ")
@@ -100,16 +85,16 @@ export default function Form(){
                 {!newUserShow && (<form className="flex flex-col m-3" onSubmit={handleSignIn}>
                     <input className="border p-1 mb-1" type="text" name="PIN" placeholder="PIN" value={pin} onChange={(e) => setPin(e.target.value)} required/>
                     {exists && (<input className="border p-1 my-1" type="text" name="workSubject" placeholder="What did you work on?" value={text} onChange={(e) => setText(e.target.value)} required/>)}
-                    <button className="border p-1 my-1 text-white bg-green-600 hover:bg-green-500" type="submit">{exists ? "Clock Out" : "Clock In"}</button>
+                    <button className="border p-1 my-1 text-white bg-green-600 hover:bg-green-500 rounded" type="submit">{exists ? "Clock Out" : "Clock In"}</button>
                 </form>)}
-                {parseInt(pin) === 1050 ? <NavLink to={'/admin'} className="border p-1 mx-3 text-white bg-violet-600 hover:bg-violet-500">Go to Admin</NavLink>: ""}
-                <button onClick={handleNewUser} className="border p-1 m-3 text-white bg-green-600 hover:bg-green-500">{newUserShow ? "Back to Login" :"No ID? Create new user here."}</button>
+                {parseInt(pin) === 1050 ? <NavLink to={'/admin'} className="border p-1 mx-3 text-white bg-violet-600 hover:bg-violet-500 rounded">Go to Admin</NavLink>: ""}
+                <button onClick={handleNewUser} className="border p-1 m-3 text-white bg-green-600 hover:bg-green-500 rounded">{newUserShow ? "Back to Login" :"No ID? Create new user here."}</button>
                 {newUserShow && (
                 <div>
                 <form className="flex flex-col m-3" onSubmit={handleNewUserForm}>
                     <input className="border p-1 mb-1" type="text" name="PIN" placeholder="Set a PIN" value={pin} onChange={(e) => setPin(e.target.value)} required/>
                     <input className="border p-1 my-1" type="text" name="name" placeholder="What is your name?" value={name} onChange={(e) => setName(e.target.value)} required/>
-                    <button className="border p-1 my-1 text-white bg-green-600 hover:bg-green-500" type="submit">Create!</button>
+                    <button className="border p-1 my-1 text-white bg-green-600 hover:bg-green-500 rounded" type="submit">Create!</button>
                 </form>
                 </div>)} 
         </div>
