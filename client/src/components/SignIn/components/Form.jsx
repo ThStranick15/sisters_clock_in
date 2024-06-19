@@ -27,7 +27,9 @@ export default function Form(){
         variables: {pin: parseInt(pin), description: text}
     })
 
-    const [getUser, {called,loading,data}] = useLazyQuery(GET_USER)
+    const [getUser, {called,loading,data}] = useLazyQuery(GET_USER,
+        {fetchPolicy: 'network-only'}
+    )
 
     function handleNewUser() { //handles new user form after clicking button
         newUserShow ? setNewUserShow(false) : setNewUserShow(true)
