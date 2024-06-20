@@ -21,6 +21,11 @@ export const GET_ALL_USERS = gql`
         getAllUsers{
             pin
             name
+            logs {
+                date
+                description
+                hours
+              }
         }
     }
 `

@@ -56,15 +56,14 @@ export default function Form(){
         const res = await getUser({
             variables: {pin: parseInt(pin)}
         })
-        console.log(res)
         setRecentSignIn(res.data.getUser.name)
-            if(signedInUsers.includes(res.data.getUser)){
-                setSignedInUsers(prevUsers => {return prevUsers.filter((user)=>user !== res.data.getUser)}) //front end
-                signOutUser()
+            if(exists){ //signedInUsers.includes(res.data.getUser)
+                setSignedInUsers(prevUsers => {return prevUsers.filter((user)=>user.pin !== res.data.getUser.pin)}) //front end
+                signOutUser() //backend time stamp
                 }
                 else{
                 setSignedInUsers(prevUsers => [...prevUsers, res.data.getUser]) //front end
-                signInUser()
+                signInUser() //backend time stamp
                 }
         setPin("")
         setText("")

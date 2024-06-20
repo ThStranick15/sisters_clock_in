@@ -1,29 +1,30 @@
 import { useState } from "react"
 import { GET_USER, GET_ALL_USERS } from "../../graphql/queries"
-import { useLazyQuery } from "@apollo/client"
+import { useLazyQuery, useQuery } from "@apollo/client"
+import XLSXExport from "./components/xlsx"
 
 export default function Admin() {
     const [result, setResult] = useState([])
     const[pin, setPin] = useState()
 
-    const [getUser, {called,loading,data}] = useLazyQuery(GET_USER,
+    const [getUser, {loading: userloading, data: userdata}] = useLazyQuery(GET_USER,
         {fetchPolicy: 'network-only'}
     )
-    //const [getUsers, {called,loading,data}] = useLazyQuery(GET_ALL_USERS)
+    const [getAllUsers, {loading: allloading, data: alldata}] = useLazyQuery(GET_ALL_USERS)
+
+    const {loading: allloadingxlsx, data: alldataxlsx} = useQuery(GET_ALL_USERS)
 
     async function handleSearch(e){
         e.preventDefault()
-        console.log(pin)
         const res = await getUser({
             variables: {pin: parseInt(pin)}
         })
-        console.log(res.data.getUser)
     }
 
-    function totalHours() {
+    function totalHours(user) {
         let sum = 0;
 
-        data?.getUser.logs.forEach(el => {
+        user.logs.forEach(el => {
             sum = sum + el.hours
         });
 
@@ -41,24 +42,40 @@ export default function Admin() {
 
     return(
         <section className="flex flex-col flex-1 items-center">
-            <h1>Admin Page</h1>
+            <h1 className="text-xl m-2 p-2 bg-violet-600 text-white rounded">Admin Page</h1>
+            <XLSXExport users={alldataxlsx.getAllUsers}/>
             <div className="flex flex-row bg-green-700 m-3 rounded p-3">
                 <form onSubmit={handleSearch}>
                     <input className="border mx-2 rounded p-2" type="text" name="pin" placeholder="Enter Pin" value={pin} onChange={(e) => setPin(e.target.value)}/>
                     <button className="border p-1 my-1 mx-2 text-white bg-green-600 hover:bg-green-500 rounded" type="submit">Search</button>
                 </form>
-                <button className="border p-1 my-1 mx-2 text-white bg-green-600 hover:bg-green-500 rounded">List All Students</button>
+                <button className="border p-1 my-1 mx-2 text-white bg-green-600 hover:bg-green-500 rounded" onClick={getAllUsers}>List All Students</button>
             </div>
-            {(loading || !data) ? '' : 
+            {(userloading || !userdata) ? '' : 
             <div className="flex flex-col ">
                 <div className="flex flex- bg-violet-700 text-md text-white rounded">
-                    <p className="bg-violet-500 m-2 p-2 rounded">Pin: {data?.getUser.pin}</p> 
-                    <p className="bg-violet-500 m-2 p-2 rounded">Name: {data?.getUser.name}</p>
-                    <p className="bg-violet-500 m-2 p-2 rounded">Days: {totalHours().days} Hours: {totalHours().hours} Minutes: {totalHours().minutes} Seconds: {totalHours().seconds}</p>
+                    <p className="bg-violet-500 m-2 p-2 rounded">Pin: {userdata?.getUser.pin}</p> 
+                    <p className="bg-violet-500 m-2 p-2 rounded">Name: {userdata?.getUser.name}</p>
+                    <p className="bg-violet-500 m-2 p-2 rounded">{totalHours(userdata?.getUser).days} Days {totalHours(userdata?.getUser).hours} Hours  {totalHours(userdata?.getUser).minutes} Minutes {totalHours(userdata?.getUser).seconds} Seconds</p>
                 </div> 
                 <div className="flex flex-col bg-violet-700 my-2 p-2 text-md text-white rounded">
-                     {data?.getUser.logs.map(e => {return <p className="bg-violet-500 m-2 p-2 rounded">{e.date} {e.description} {e.hours}</p>})}
+                     {userdata?.getUser.logs.map(e => {return (
+                        <div className="bg-violet-500 m-2 p-2 rounded">
+                            <p>Date: {e.date}</p>
+                            <p>Worked On: {e.description}</p> <p>Hours: {e.hours}</p>
+                        </div>
+                      )})}
                 </div>
+            </div>
+            }
+            {(allloading || !alldata)? '':
+            <div className="flex flex-col bg-violet-700 text-md text-white rounded">
+                {alldata.getAllUsers.map(e => {return(
+                    <div className="flex bg-violet-500 m-2 p-2 rounded justify-between">
+                        <p className="mx-2">Name: {e.name}</p>
+                        <p className="mx-2">Total Hours: {totalHours(e).hours}</p>
+                    </div>
+                    )})}
             </div>
             }
         </section>

@@ -21,7 +21,7 @@ const typeDefs = gql`
 
     type Query {
         getUser(pin: Int!): User
-        getUsers: [User]
+        getAllUsers: [User]
     }
 
     type Mutation {

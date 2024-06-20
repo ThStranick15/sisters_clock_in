@@ -9,10 +9,10 @@ const resolvers = {
             return user
         },
 
-        // async getUsers(){
-        //     const users = await User.find()
-        //     return users
-        // }
+        async getAllUsers(){
+            const users = await User.find()
+            return users
+        }
     },
     Mutation:{
         async createUser(_,{pin, name}){
