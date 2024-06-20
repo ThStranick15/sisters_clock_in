@@ -5,6 +5,13 @@ export const GET_USER = gql`
         getUser(pin: $pin){
             pin
             name
+            logs {
+                date
+                description
+                hours
+              }
+            timeIn
+            timeOut
         }
     }
 `
@@ -14,6 +21,11 @@ export const GET_ALL_USERS = gql`
         getAllUsers{
             pin
             name
+            logs {
+                date
+                description
+                hours
+              }
         }
     }
 `
