@@ -42,6 +42,8 @@ const resolvers = {
                 description: description,
                 hours: hours
             })
+            user.timeIn = null
+            user.timeOut = null
             await user.save()
         }
 

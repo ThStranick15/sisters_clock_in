@@ -10,6 +10,8 @@ const { ApolloServer } = require('apollo-server-express')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require ('./graphql/resolvers')
 
+//const job = require('./utils/schedule') //job to check at midnight whether users have signed out or not
+
 async function startServer(){
     const server = new ApolloServer({typeDefs, resolvers}) //create Apollo server
     await server.start() //must call start before applying express
