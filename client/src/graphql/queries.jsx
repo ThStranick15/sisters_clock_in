@@ -26,6 +26,8 @@ export const GET_ALL_USERS = gql`
                 description
                 hours
               }
+            timeIn
+            timeOut
         }
     }
 `

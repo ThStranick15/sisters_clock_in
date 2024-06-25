@@ -1,16 +1,7 @@
 import * as XLSX from 'xlsx'
 import {saveAs} from 'file-saver'
-import { GET_ALL_USERS } from "../../../graphql/queries"
-import { useLazyQuery } from "@apollo/client"
 
 export default function XLSXExport(props){
-
-    //const [getAllUsers, {loading, data}] = useLazyQuery(GET_ALL_USERS)
-
-    const data = [
-        { name: "John", email: "john@example.com", age: 28 },
-        { name: "Jane", email: "jane@example.com", age: 32 }
-    ];
 
     async function exportXLS(){
         //await getAllUsers()
@@ -32,6 +23,6 @@ export default function XLSXExport(props){
     }
 
     return(
-        <button onClick={exportXLS}>Export XLSX</button>
+        <button className="border p-1 my-1 mx-2 text-white bg-green-600 hover:bg-green-500 rounded" onClick={exportXLS}>Export XLSX</button>
     )
 }

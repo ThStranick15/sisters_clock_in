@@ -4,27 +4,37 @@ import { useLazyQuery, useQuery } from "@apollo/client"
 import XLSXExport from "./components/xlsx"
 
 export default function Admin() {
-    const [result, setResult] = useState([])
+    const [view, setView] = useState("")
     const[pin, setPin] = useState()
 
     const [getUser, {loading: userloading, data: userdata}] = useLazyQuery(GET_USER,
         {fetchPolicy: 'network-only'}
     )
-    const [getAllUsers, {loading: allloading, data: alldata}] = useLazyQuery(GET_ALL_USERS)
+    const [getAllUsers, {loading: allloading, data: alldata}] = useLazyQuery(GET_ALL_USERS,
+        {fetchPolicy: 'network-only'}
+    )
 
-    const {loading: allloadingxlsx, data: alldataxlsx} = useQuery(GET_ALL_USERS)
+    const { data: alldataxlsx} = useQuery(GET_ALL_USERS)
 
     async function handleSearch(e){
         e.preventDefault()
+        setView("one")
+        console.log(view)
         const res = await getUser({
             variables: {pin: parseInt(pin)}
         })
     }
 
+    async function handleSearchAll(){
+        setView("all")
+        console.log(view)
+        getAllUsers()
+    }
+
     function totalHours(user) {
         let sum = 0;
 
-        user.logs.forEach(el => {
+        user?.logs.forEach(el => {
             sum = sum + el.hours
         });
 
@@ -41,18 +51,19 @@ export default function Admin() {
     }
 
     return(
-        <section className="flex flex-col flex-1 items-center">
-            <h1 className="text-xl m-2 p-2 bg-violet-600 text-white rounded">Admin Page</h1>
-            <XLSXExport users={alldataxlsx.getAllUsers}/>
-            <div className="flex flex-row bg-green-700 m-3 rounded p-3">
+        <section className="flex flex-col flex-1 items-center w-1/2 m-auto">
+            <h1 className="text-xl m-2 p-2 bg-violet-600 text-white rounded w-full">Admin Page</h1>
+            
+            <div className="flex flex-row bg-green-700 m-3 rounded p-3 w-full">
                 <form onSubmit={handleSearch}>
                     <input className="border mx-2 rounded p-2" type="text" name="pin" placeholder="Enter Pin" value={pin} onChange={(e) => setPin(e.target.value)}/>
                     <button className="border p-1 my-1 mx-2 text-white bg-green-600 hover:bg-green-500 rounded" type="submit">Search</button>
                 </form>
-                <button className="border p-1 my-1 mx-2 text-white bg-green-600 hover:bg-green-500 rounded" onClick={getAllUsers}>List All Students</button>
+                <button className="border p-1 my-1 mx-2 text-white bg-green-600 hover:bg-green-500 rounded" onClick={handleSearchAll}>List All Students</button>
+                <XLSXExport  users={alldataxlsx?.getAllUsers}/>
             </div>
-            {(userloading || !userdata) ? '' : 
-            <div className="flex flex-col ">
+            {(userloading || !userdata || view !== "one") ? '' : 
+            <div className="flex flex-col w-3/4">
                 <div className="flex flex- bg-violet-700 text-md text-white rounded">
                     <p className="bg-violet-500 m-2 p-2 rounded">Pin: {userdata?.getUser.pin}</p> 
                     <p className="bg-violet-500 m-2 p-2 rounded">Name: {userdata?.getUser.name}</p>
@@ -62,18 +73,20 @@ export default function Admin() {
                      {userdata?.getUser.logs.map(e => {return (
                         <div className="bg-violet-500 m-2 p-2 rounded">
                             <p>Date: {e.date}</p>
-                            <p>Worked On: {e.description}</p> <p>Hours: {e.hours}</p>
+                            <p>Worked On: {e.description}</p> 
+                            <p>Hours: {e.hours}</p>
                         </div>
                       )})}
                 </div>
             </div>
             }
-            {(allloading || !alldata)? '':
-            <div className="flex flex-col bg-violet-700 text-md text-white rounded">
-                {alldata.getAllUsers.map(e => {return(
+            {(allloading || !alldata || view !== "all") ? '':
+            <div className="flex flex-col bg-violet-700 text-md text-white rounded w-3/4">
+                {alldata?.getAllUsers.map(e => {return(
                     <div className="flex bg-violet-500 m-2 p-2 rounded justify-between">
                         <p className="mx-2">Name: {e.name}</p>
-                        <p className="mx-2">Total Hours: {totalHours(e).hours}</p>
+                        <p className="mx-2">Pin: {e.pin}</p>
+                        <p className="mx-2">Total: {totalHours(e).days} Days {totalHours(e).hours} Hours  {totalHours(e).minutes} Minutes {totalHours(e).seconds} Seconds</p>
                     </div>
                     )})}
             </div>
