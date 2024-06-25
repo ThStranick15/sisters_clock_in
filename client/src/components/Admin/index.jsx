@@ -10,7 +10,9 @@ export default function Admin() {
     const [getUser, {loading: userloading, data: userdata}] = useLazyQuery(GET_USER,
         {fetchPolicy: 'network-only'}
     )
-    const [getAllUsers, {loading: allloading, data: alldata}] = useLazyQuery(GET_ALL_USERS)
+    const [getAllUsers, {loading: allloading, data: alldata}] = useLazyQuery(GET_ALL_USERS,
+        {fetchPolicy: 'network-only'}
+    )
 
     const { data: alldataxlsx} = useQuery(GET_ALL_USERS)
 

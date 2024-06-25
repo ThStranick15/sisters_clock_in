@@ -1,7 +1,7 @@
 import { useState,useEffect } from "react"
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client"
 import { CREATE_USER,SIGN_IN_USER, SIGN_OUT_USER } from "../../../graphql/mutations"
-import { GET_USER } from "../../../graphql/queries"
+import { GET_USER, GET_ALL_USERS } from "../../../graphql/queries"
 import { useStore } from "../../../store"
 import { NavLink } from "react-router-dom"
 
@@ -9,6 +9,7 @@ export default function Form(){
     const[newUserShow, setNewUserShow] = useState(false)
     const {state, setState} = useStore()
     const[signedInUsers,setSignedInUsers] = useState([])
+    const [showCheckedIn,setShowCheckedIn] = useState(false)
     const[recentSignIn,setRecentSignIn] = useState('')
     const [exists, setExists] = useState(false)
     const[pin, setPin] = useState()
@@ -31,14 +32,31 @@ export default function Form(){
         {fetchPolicy: 'network-only'}
     )
 
+    const [getAllUsers, {loading: allloading, data: alldata}] = useLazyQuery(GET_ALL_USERS,
+        {fetchPolicy: 'network-only'}
+    )
+
     function handleNewUser() { //handles new user form after clicking button
         newUserShow ? setNewUserShow(false) : setNewUserShow(true)
     }
 
+    async function loadPage(){
+        const allUsersCurr = await getAllUsers() //gets users
+        setSignedInUsers(s(allUsersCurr.data.getAllUsers)) //filters signedin users
+    }
+
+    useEffect(()=>{ //on page load, find any users that are signed in
+        loadPage()
+    },[])
+
+    useEffect(()=>{ //after signedInUsers are set, trigger load of checked in
+        setShowCheckedIn(true)
+    },[signedInUsers])
+     
+
     async function handleNewUserForm(e){
         e.preventDefault()
-        console.log(pin, name)
-        if(pin.length != 4){
+        if(pin.length != 4){ //if not 4 numbers error, else create the user
             console.log("Not 4 length")
         }
         else{
@@ -53,18 +71,27 @@ export default function Form(){
 
     async function handleSignIn(e){
         e.preventDefault()
-        const res = await getUser({
+        setShowCheckedIn(false)
+        const res = await getUser({ //get user that inputted pin
             variables: {pin: parseInt(pin)}
         })
+
         setRecentSignIn(res.data.getUser.name)
-            if(exists){ //signedInUsers.includes(res.data.getUser)
-                setSignedInUsers(prevUsers => {return prevUsers.filter((user)=>user.pin !== res.data.getUser.pin)}) //front end
-                signOutUser() //backend time stamp
-                }
-                else{
-                setSignedInUsers(prevUsers => [...prevUsers, res.data.getUser]) //front end
-                signInUser() //backend time stamp
-                }
+
+        function findPin(value){ //used below
+            return value.pin === res.data.getUser.pin
+        }
+
+        if(signedInUsers.find(findPin)){ //check whether user is signed in
+            await signOutUser() //backend time stamp
+            
+        }else{
+            await signInUser() //backend time stamp
+        }
+        
+        const allUsersAfter = await getAllUsers() //gets user after sign out/in
+        const s1 = s(allUsersAfter.data.getAllUsers)//sets front end array to filter on signed in
+        setSignedInUsers(s1)
         setPin("")
         setText("")
     }
@@ -75,6 +102,11 @@ export default function Form(){
         return(namesString)
     }
 
+    function s(allUsers){
+        const filterSignedIn = allUsers.filter((el) => el.timeIn !== null)
+        return filterSignedIn
+    }
+
     useEffect(()=>{ //checks current pin and sees if user is signed in
         const pins = signedInUsers.map((e)=>e.pin)
         setExists(pins.includes(parseInt(pin)))
@@ -82,7 +114,7 @@ export default function Form(){
 
     return(
         <section className="flex flex-col w-3/4 md:w-1/4">
-        <div className="flex flex-col bg-green-700 m-3 rounded">
+        <div className="flex flex-col bg-green-700 m-3 rounded shadow-lg">
                 {!newUserShow && (<form className="flex flex-col m-3" onSubmit={handleSignIn}>
                     <input className="border p-1 mb-1" type="text" name="PIN" placeholder="PIN" value={pin} onChange={(e) => setPin(e.target.value)} required/>
                     {exists && (<input className="border p-1 my-1" type="text" name="workSubject" placeholder="What did you work on?" value={text} onChange={(e) => setText(e.target.value)} required/>)}
@@ -99,9 +131,9 @@ export default function Form(){
                 </form>
                 </div>)} 
         </div>
-        <div className="bg-green-700 m-3 p-5 rounded text-white">
-            {(called && loading) ? (<p>Loading</p>) : (<p> <span className="font-bold">Last Checked Out/In:</span> {recentSignIn}</p>)}
-            {(called && loading) ? (<p>Loading</p>) : (<p><span className="font-bold">Users Checked In:</span> {list()}</p>)}
+        <div className="bg-violet-700 m-3 p-5 rounded text-white shadow-lg">
+            {showCheckedIn ? (<p className="border p-1 my-1 bg-violet-500 rounded">Last Checked Out/In: {recentSignIn}</p>) : (<p>Loading</p>)}
+            {showCheckedIn ?  (<p className="border p-1 my-1 bg-violet-500 rounded">Users Checked In: {list()}</p>) : (<p>Loading</p>)}
         </div>
         </section>
         
