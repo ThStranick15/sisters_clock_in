@@ -2,7 +2,7 @@ const express = require('express') //Node.js framework
 const app = express()
 const db = require('./config/connection') //connection to mongoose/mongoDB
 
-const PORT = 3600
+const PORT = process.env.PORT || 3600
 
 const { ApolloServer } = require('apollo-server-express')
 
