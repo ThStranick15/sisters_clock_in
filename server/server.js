@@ -2,7 +2,7 @@ const express = require('express') //Node.js framework
 const app = express()
 const db = require('./config/connection') //connection to mongoose/mongoDB
 
-const PORT = 3600
+const PORT = process.env.PORT || 3600
 
 const { ApolloServer } = require('apollo-server-express')
 
@@ -17,6 +17,13 @@ async function startServer(){
     await server.start() //must call start before applying express
 
     server.applyMiddleware({app}) //attatches express to apollo
+
+    if (process.env.PORT) {
+        app.use(express.static('../client/dist'))
+        app.get('*', (req, res) => {
+          res.sendFile(path.join(__dirname, '../client/dist/index.html'))
+        })
+      }
 
     app.listen(PORT,() => {
         console.log(`🚀 Express Server ready at`, PORT)
