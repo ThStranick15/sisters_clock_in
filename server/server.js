@@ -18,6 +18,13 @@ async function startServer(){
 
     server.applyMiddleware({app}) //attatches express to apollo
 
+    if (process.env.PORT) {
+        app.use(express.static('../client/dist'))
+        app.get('*', (req, res) => {
+          res.sendFile(path.join(__dirname, '../client/dist/index.html'))
+        })
+      }
+
     app.listen(PORT,() => {
         console.log(`🚀 Express Server ready at`, PORT)
         console.log('GraphQL ready at', server.graphqlPath)
