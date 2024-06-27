@@ -9,6 +9,7 @@ export default function Form(){
     const [newUserShow, setNewUserShow] = useState(false)
     const [showPinErr, setShowPinErr] = useState(false)
     const [showPinLengthErr, setShowPinLengthErr] = useState(false)
+    const [showPinExistsErr, setShowPinExistsErr] = useState(false)
     const [showCheckedIn,setShowCheckedIn] = useState(false)
     //const {state, setState} = useStore()
     const [allUsers, setAllUsers] = useState([])
@@ -64,14 +65,18 @@ export default function Form(){
             setShowPinLengthErr(true)
         }
         else{
-            setShowPinLengthErr(false)
-            await createUser()
-            alert(`New User: ${name} with PIN: ${pin} has been created.`)
-            setPin("")
-            setName("")
-            setNewUserShow(false)
-            const allUsers = await getAllUsers() //resets all user variable when new user created
-            setAllUsers(allUsers.data.getAllUsers.map((e)=> e.pin)) 
+            if(allUsers.includes(parseInt(pin))){
+                setShowPinExistsErr(true)
+            } else{
+                await createUser()
+                alert(`New User: ${name} with PIN: ${pin} has been created.`)
+                setPin("")
+                setName("")
+                setNewUserShow(false)
+                const allUsers = await getAllUsers() //resets all user variable when new user created
+                setAllUsers(allUsers.data.getAllUsers.map((e)=> e.pin)) 
+            }
+            
         }
         
     }
@@ -125,6 +130,7 @@ export default function Form(){
         setExists(pins.includes(parseInt(pin)))
         setShowPinErr(false)
         setShowPinLengthErr(false)
+        setShowPinExistsErr(false)
     },[pin])
 
     return(
@@ -143,6 +149,7 @@ export default function Form(){
                 <form className="flex flex-col m-3" onSubmit={handleNewUserForm}>
                     <input className="border p-1 mb-1" type="text" name="PIN" placeholder="Set a PIN" value={pin} onChange={(e) => setPin(e.target.value)} required/>
                     {showPinLengthErr && (<p className="border bg-red-500 text-white px-2 py-1 w-fit rounded">PIN must be 4 numbers in length</p>)}
+                    {showPinExistsErr && (<p className="border bg-red-500 text-white px-2 py-1 w-fit rounded">PIN already exists</p>)}
                     <input className="border p-1 my-1" type="text" name="name" placeholder="What is your name?" value={name} onChange={(e) => setName(e.target.value)} required/>
                     <button className="border p-1 my-1 text-white bg-green-600 hover:bg-green-500 rounded" type="submit">Create!</button>
                 </form>
