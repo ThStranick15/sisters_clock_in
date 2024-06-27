@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { GET_USER, GET_ALL_USERS } from "../../graphql/queries"
 import { useLazyQuery, useQuery } from "@apollo/client"
 import XLSXExport from "./components/xlsx"
@@ -6,6 +6,8 @@ import XLSXExport from "./components/xlsx"
 export default function Admin() {
     const [view, setView] = useState("")
     const[pin, setPin] = useState()
+    const [allUsers, setAllUsers] = useState([])
+    const [showPinErr, setShowPinErr] = useState(false)
 
     const [getUser, {loading: userloading, data: userdata}] = useLazyQuery(GET_USER,
         {fetchPolicy: 'network-only'}
@@ -16,13 +18,27 @@ export default function Admin() {
 
     const { data: alldataxlsx} = useQuery(GET_ALL_USERS)
 
+    async function loadPage(){
+        const allUsers = await getAllUsers() //gets users
+        setAllUsers(allUsers.data.getAllUsers.map((e)=> e.pin)) //variable to reference all users on backend
+    }
+
+    useEffect(()=>{ //on page load, find any users that are signed in
+        loadPage()
+    },[])
+
     async function handleSearch(e){
         e.preventDefault()
-        setView("one")
-        console.log(view)
-        const res = await getUser({
-            variables: {pin: parseInt(pin)}
-        })
+        if(allUsers.includes(parseInt(pin))){
+            setView("one")
+            console.log(view)
+            const res = await getUser({
+                variables: {pin: parseInt(pin)}
+            })
+        }else{
+            setShowPinErr(true)
+        }
+        
     }
 
     async function handleSearchAll(){
@@ -50,13 +66,18 @@ export default function Admin() {
         }
     }
 
+    useEffect(()=>{
+        setShowPinErr(false)
+    },[pin])
+
     return(
         <section className="flex flex-col flex-1 items-center w-1/2 m-auto">
             <h1 className="text-xl m-2 p-2 bg-violet-600 text-white rounded w-full">Admin Page</h1>
             
             <div className="flex flex-row bg-green-700 m-3 rounded p-3 w-full">
-                <form onSubmit={handleSearch}>
+                <form className="flex flex-row items-center" onSubmit={handleSearch}>
                     <input className="border mx-2 rounded p-2" type="text" name="pin" placeholder="Enter Pin" value={pin} onChange={(e) => setPin(e.target.value)}/>
+                    {showPinErr && (<p className="border bg-red-500 text-white px-2 py-1 w-fit rounded">Invalid PIN</p>)}
                     <button className="border p-1 my-1 mx-2 text-white bg-green-600 hover:bg-green-500 rounded" type="submit">Search</button>
                 </form>
                 <button className="border p-1 my-1 mx-2 text-white bg-green-600 hover:bg-green-500 rounded" onClick={handleSearchAll}>List All Students</button>
