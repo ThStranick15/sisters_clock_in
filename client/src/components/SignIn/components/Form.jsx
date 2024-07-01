@@ -115,7 +115,7 @@ export default function Form(){
     }
 
     function list(){ //lists out names of people who have signed in
-        const names = signedInUsers.map((e)=><p className="border p-1 my-1 bg-violet-500 rounded">{e.pin} - {e.name} - {(new Date(e.timeIn)).toLocaleTimeString('en-US')}</p>)
+        const names = signedInUsers.map((e)=><p className="border p-1 my-1 bg-violet-500 rounded text-center">{e.pin} - {e.name} - {(new Date(e.timeIn)).toLocaleTimeString('en-US')}</p>)
         console.log(names)
         return(names)
     }
